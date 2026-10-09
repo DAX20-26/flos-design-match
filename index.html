@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6e8ea">
+  <meta name="description" content="Flos Design Match: il gioco floreale di Flos Design. Combina fiori e bruchi, crea due Brucaliffo e falli sbocciare.">
+  <title>FLOS DESIGN MATCH</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23f6e4e6'/%3E%3Ccircle cx='50' cy='50' r='24' fill='none' stroke='%23a98fd3' stroke-width='12' stroke-dasharray='7 4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="svg-defs" aria-hidden="true"></div>
+  <div class="bg-petals" id="bg-petals" aria-hidden="true"></div>
+
+  <main id="app">
+
+    <!-- SCHERMATA INIZIALE -->
+    <section id="screen-start" class="screen active" aria-labelledby="title">
+      <div class="start-inner">
+        <p class="eyebrow">gioielli artigianali</p>
+        <h1 id="title" class="title">
+          <span class="title-brand">FLOS DESIGN</span>
+          <span class="title-rule" aria-hidden="true"><i></i><b></b><i></i></span>
+          <span class="title-match">MATCH</span>
+        </h1>
+        <div class="hero" id="hero" aria-hidden="true"></div>
+        <button id="btn-play" class="btn btn-primary" type="button">GIOCA</button>
+        <p class="tagline">Combina fiori e bruchi,<br>crea due Brucaliffo e falli sbocciare.</p>
+      </div>
+    </section>
+
+    <!-- SCHERMATA DI GIOCO -->
+    <section id="screen-game" class="screen" aria-label="Partita">
+      <header class="topbar">
+        <button id="btn-home" class="icon-btn" type="button" aria-label="Torna alla schermata iniziale">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="wordmark">FLOS DESIGN</div>
+        <div class="level-pill" id="level-label" aria-live="polite">Livello 1 / 3</div>
+      </header>
+
+      <div class="hud">
+        <div class="hud-moves">
+          <span class="hud-label">Mosse</span>
+          <span class="hud-value" id="moves" aria-live="polite">22</span>
+        </div>
+        <div class="hud-goal">
+          <div class="goal-slots" id="goal-slots" aria-label="Brucaliffo creati">
+            <span class="slot" data-slot="0"></span>
+            <span class="goal-link" aria-hidden="true">⇄</span>
+            <span class="slot" data-slot="1"></span>
+          </div>
+          <span class="hud-label">Crea due Brucaliffo e scambiali</span>
+        </div>
+      </div>
+
+      <div id="board-wrap">
+        <div id="board" role="application" aria-label="Griglia di gioco 8 per 8"></div>
+        <div id="flash" aria-hidden="true"></div>
+      </div>
+      <p id="toast" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- SCHERMATA FINALE -->
+    <section id="screen-final" class="screen" aria-labelledby="final-title">
+      <div class="final-inner">
+        <div class="bloom" id="bloom" aria-hidden="true"></div>
+        <h2 id="final-title" class="final-title">Hai fatto sbocciare Flos 🌸</h2>
+        <p class="final-text">Un piccolo abbraccio virtuale da Flos Design.</p>
+        <p class="final-text">Grazie per far parte della nostra community.</p>
+        <button id="btn-replay" class="btn btn-primary" type="button">Rigioca dall'inizio</button>
+        <p class="final-brand">FLOS DESIGN</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FINESTRA (introduzione livello, livello superato, sconfitta) -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-art" id="modal-art" aria-hidden="true"></div>
+      <p class="modal-kicker" id="modal-kicker"></p>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <div class="modal-body" id="modal-body"></div>
+      <button id="modal-btn" class="btn btn-primary" type="button">Inizia</button>
+    </div>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <script src="js/engine.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

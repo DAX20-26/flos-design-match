@@ -24,7 +24,7 @@
   var speed = reducedMotion ? 0.35 : 1;
 
   var S = {
-    game: null, level: 0, attempt: 0, busy: true,
+    game: null, level: 0, attempt: 0, run: 0, epoch: 0, busy: true,
     pieces: new Map(),   // id -> { el, kind, variant, r, c }
     sel: null, drag: null, hintTimer: 0, hintIds: [], created: 0, toastTimer: 0
   };
@@ -142,7 +142,11 @@
     els.mBody.innerHTML = o.body || '';
     els.mBtn.textContent = o.button;
     els.modal.hidden = false;
-    els.mBtn.onclick = function () { els.modal.hidden = true; if (o.onClick) o.onClick(); };
+    els.mBtn.onclick = function () {
+      els.mBtn.onclick = null; // un solo click utile (evita doppi tocchi)
+      els.modal.hidden = true;
+      if (o.onClick) o.onClick();
+    };
     setTimeout(function () { els.mBtn.focus({ preventScroll: true }); }, 50);
   }
 
@@ -158,10 +162,11 @@
 
   function newGame() {
     var seed;
-    if (fixedSeed !== null) seed = fixedSeed + S.level * 1000 + S.attempt * 7919;
+    if (fixedSeed !== null) seed = fixedSeed + S.run * 104729 + S.level * 1000 + S.attempt * 7919;
     else seed = (Math.random() * 4294967296) >>> 0;
     S.game = new E.Game(S.level, E.mulberry32(seed));
     S.attempt++;
+    S.epoch++;
     S.busy = true;
     els.board.classList.remove('finished');
     resetSlots();
@@ -186,7 +191,7 @@
   }
 
   function beginRun() {
-    S.level = 0; S.attempt = 0;
+    S.level = 0; S.attempt = 0; S.run++;
     FX.clear();
     show('game');
     startLevel();
@@ -215,12 +220,14 @@
       title: 'Quasi sbocciato…',
       body: '<p>Il giardino ha bisogno di un nuovo inizio: si riparte dal livello 1. I tentativi sono illimitati.</p>',
       button: 'Riprova',
-      onClick: function () { S.level = 0; S.attempt = 0; startLevel(); }
+      onClick: function () { S.level = 0; S.attempt = 0; S.run++; startLevel(); }
     });
   }
 
   function showFinal() {
     S.busy = true;
+    S.epoch++;
+    els.modal.hidden = true;
     clearHint();
     buildBloom();
     show('final');
@@ -263,7 +270,7 @@
 
   function snapById(board) { var m = {}; board.forEach(function (p) { m[p.id] = p; }); return m; }
 
-  async function playCascade(st) {
+  async function playCascade(st, ep) {
     var byId = snapById(st.board), mergeIds = {}, i;
     st.merges.forEach(function (m) {
       m.ids.forEach(function (id) { mergeIds[id] = true; setPos(id, m.to.r, m.to.c, 'quick'); var p = S.pieces.get(id); if (p) p.el.classList.add('merging'); });
@@ -278,6 +285,7 @@
       }
     });
     await sleep(300 * speed);
+    if (ep !== S.epoch) return;
     st.clearIds.forEach(removePiece);
 
     // nuovi elementi: i Brucaliffo nascono sul posto, gli altri cadono dall'alto
@@ -294,12 +302,14 @@
     });
     void els.board.offsetWidth;
     if (st.spawned.length) await sleep(520 * speed); else await sleep(30);
+    if (ep !== S.epoch) return;
     st.board.forEach(function (p) { setPos(p.id, p.r, p.c); });
     await sleep(430 * speed);
+    if (ep !== S.epoch) return;
     for (i = 0; i < st.board.length; i++) { var q = S.pieces.get(st.board[i].id); if (q) q.el.classList.remove('spawn'); }
   }
 
-  async function playSync(st) {
+  async function playSync(st, ep) {
     var byId = snapById(st.board);
     st.changed.forEach(function (id) {
       var p = S.pieces.get(id), info = byId[id];
@@ -309,22 +319,26 @@
       p.el.classList.remove('bloom'); void p.el.offsetWidth; p.el.classList.add('bloom');
     });
     await sleep(500 * speed);
+    if (ep !== S.epoch) return;
     S.pieces.forEach(function (p) { p.el.classList.remove('bloom'); });
   }
 
-  async function playShuffle(st) {
+  async function playShuffle(st, ep) {
     toast('Nessuna mossa possibile: il giardino si rimescola…', 2600);
     await sleep(350 * speed);
+    if (ep !== S.epoch) return;
     st.board.forEach(function (p) { setPos(p.id, p.r, p.c, 'slow'); });
     await sleep(850 * speed);
+    if (ep !== S.epoch) return;
     S.pieces.forEach(function (p) { p.el.classList.remove('slow'); });
   }
 
-  async function playExplosion(st, swap) {
+  async function playExplosion(st, swap, ep) {
     var ids = [swap.idA, swap.idB];
     ids.forEach(function (id) { var p = S.pieces.get(id); if (p) p.el.classList.add('ignite'); });
     toast('Due Brucaliffo: il giardino sboccia!', 3000);
     await sleep(600 * speed);
+    if (ep !== S.epoch) return;
     var o = cellCenter(st.origin.r, st.origin.c);
     var shock = document.createElement('div');
     shock.className = 'shock';
@@ -346,6 +360,7 @@
     });
     await sleep(1300 * speed);
     shock.remove();
+    if (ep !== S.epoch) return;
     els.flash.classList.remove('on');
     els.board.innerHTML = '';
     S.pieces.clear();
@@ -356,6 +371,7 @@
   async function attempt(a, b) {
     if (S.busy || !S.game || S.game.status !== 'playing') return;
     S.busy = true;
+    var ep = S.epoch;
     clearHint(); clearSelection();
     var pa = S.game.grid[a.r][a.c], pb = S.game.grid[b.r][b.c];
     var res = S.game.tryMove(a, b);
@@ -364,13 +380,16 @@
       // scambio non valido: i pezzi si sfiorano e tornano al loro posto; nessuna mossa consumata
       setPos(pa.id, b.r, b.c, 'quick'); setPos(pb.id, a.r, a.c, 'quick');
       await sleep(190 * speed);
+      if (ep !== S.epoch) return;
       setPos(pa.id, a.r, a.c, 'quick'); setPos(pb.id, b.r, b.c, 'quick');
       await sleep(210 * speed);
+      if (ep !== S.epoch) return;
       [pa, pb].forEach(function (p) {
         var x = S.pieces.get(p.id);
         if (x) { x.el.classList.remove('quick'); x.el.classList.remove('shake'); void x.el.offsetWidth; x.el.classList.add('shake'); }
       });
       await sleep(360 * speed);
+      if (ep !== S.epoch) return;
       S.busy = false; armHint();
       return;
     }
@@ -379,13 +398,14 @@
     setPos(res.swap.idA, res.swap.b.r, res.swap.b.c, 'quick');
     setPos(res.swap.idB, res.swap.a.r, res.swap.a.c, 'quick');
     await sleep(230 * speed);
-    for (var i = 0; i < res.steps.length; i++) {
+    for (var i = 0; i < res.steps.length && ep === S.epoch; i++) {
       var st = res.steps[i];
-      if (st.type === 'cascade') await playCascade(st);
-      else if (st.type === 'sync') await playSync(st);
-      else if (st.type === 'shuffle') await playShuffle(st);
-      else if (st.type === 'explosion') await playExplosion(st, res.swap);
+      if (st.type === 'cascade') await playCascade(st, ep);
+      else if (st.type === 'sync') await playSync(st, ep);
+      else if (st.type === 'shuffle') await playShuffle(st, ep);
+      else if (st.type === 'explosion') await playExplosion(st, res.swap, ep);
     }
+    if (ep !== S.epoch) return;
     S.pieces.forEach(function (p) { p.el.classList.remove('quick'); });
 
     if (res.status === 'won') { await sleep(250 * speed); levelWon(); }
@@ -447,10 +467,7 @@
   $('#btn-play').addEventListener('click', beginRun);
   $('#btn-replay').addEventListener('click', function () { FX.clear(); beginRun(); });
   $('#btn-home').addEventListener('click', function () {
-    S.busy = true; clearHint(); els.modal.hidden = true; FX.clear(); show('start');
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !els.modal.hidden) { els.mBtn.click(); }
+    S.busy = true; S.epoch++; clearHint(); els.modal.hidden = true; FX.clear(); show('start');
   });
 
   /* ---------- avvio ---------- */

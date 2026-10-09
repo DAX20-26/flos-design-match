@@ -22,7 +22,7 @@ js/engine.js      regole del gioco (logica pura, testabile in Node)
 js/art.js         illustrazioni SVG (fiori, bruco, Brucaliffo)
 js/fx.js          petali e coriandoli su canvas
 js/game.js        interfaccia, input touch/mouse, animazioni
-tests/            test automatici
+tests/            test automatici (motore, bilanciamento, UI nel browser, layout)
 ```
 
 ## Test
@@ -30,12 +30,24 @@ tests/            test automatici
 Servono solo Node 20+ (nessuna dipendenza da installare).
 
 ```bash
-npm test            # test delle meccaniche + bilanciamento dei livelli
+npm test            # test delle meccaniche + bilanciamento dei livelli (pochi secondi)
 npm run balance     # statistiche di vittoria con 200 partite simulate per livello
-npm run test:ui     # (opzionale) test nel browser con Playwright/Chromium
+npm run test:ui     # (opzionale) test nel browser: richiede Playwright con Chromium
 ```
 
-I test verificano, tra l'altro: griglia iniziale senza combinazioni e con mosse disponibili, gravità e cascate, mosse non valide che non consumano mosse, nascita del Brucaliffo, scambio libero del Brucaliffo, esplosione finale, vittoria/sconfitta, rimescolamento anti-blocco, garanzia di completabilità (fuzz su 600 partite) e curva di difficoltà (giocatore esperto e giocatore distratto simulati).
+**`npm test`** verifica, tra l'altro: griglia iniziale senza combinazioni e con mosse disponibili, gravità e cascate, mosse non valide che non consumano mosse, nascita del Brucaliffo, scambio libero del Brucaliffo, esplosione finale, vittoria/sconfitta, rimescolamento anti-blocco, garanzia di completabilità (600 partite casuali con controllo degli invarianti) e curva di difficoltà con due giocatori simulati (esperto e distratto).
+
+**`npm run test:ui`** apre il gioco in Chromium e gioca davvero con mouse e tocchi: scenari costruiti ad hoc (esplosione, spostamenti liberi del Brucaliffo, rimescolamento, sconfitta e ripartenza), una partita completa fino alla schermata finale e un controllo del layout su 9 dimensioni di schermo (da 320×568 a 1920×1080, anche in orizzontale).
+
+Risultati di bilanciamento (200 partite simulate per livello):
+
+| Livello | Mosse | Giocatore esperto | Giocatore distratto |
+|---|---|---|---|
+| 1 | 22 | ~100% | ~100% |
+| 2 | 18 | ~95% | ~80% |
+| 3 | 16 | ~80% | ~50% |
+
+La difficoltà cresce riducendo bruchi iniziali, bruchi generati e "quasi-combinazioni" già pronte; il motore però garantisce sempre che ci siano abbastanza bruchi in griglia per completare l'obiettivo.
 
 ## Pubblicazione su GitHub Pages
 

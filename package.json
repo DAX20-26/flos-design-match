@@ -5,7 +5,7 @@
   "description": "Flos Design Match - gioco match-3 floreale per Flos Design (HTML/CSS/JS statico)",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "test:ui": "node tests/ui-smoke.js",
+    "test:ui": "node tests/ui-mechanics.js && node tests/layout-check.js && node tests/ui-smoke.js",
     "balance": "node tests/simulate.js 200"
   }
 }

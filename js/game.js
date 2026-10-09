@@ -480,6 +480,20 @@
   window.__flos = {
     state: S, engine: E,
     cellRect: function (r, c) { var b = els.board.getBoundingClientRect(), cs = b.width / SIZE; return { x: b.left + (c + 0.5) * cs, y: b.top + (r + 0.5) * cs, cs: cs }; },
-    showFinal: showFinal
+    showFinal: showFinal,
+    /** Carica uno scenario costruito ad hoc (solo per test). */
+    loadLayout: function (levelIndex, rows) {
+      S.level = levelIndex; S.epoch++;
+      S.game = E.Game.fromLayout(levelIndex, rows, E.mulberry32(3));
+      els.board.classList.remove('finished');
+      els.modal.hidden = true;
+      resetSlots();
+      for (var i = 0; i < Math.min(S.game.created, 2); i++) fillSlot('lilla');
+      clearSelection(); clearHint(); buildBoard();
+      setMoves(S.game.movesLeft, false);
+      els.level.textContent = 'Livello ' + (S.level + 1) + ' / ' + E.LEVELS.length;
+      show('game');
+      S.busy = false;
+    }
   };
 })();

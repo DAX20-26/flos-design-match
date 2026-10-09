@@ -293,7 +293,7 @@ body {
 /* ---------- schermata finale ---------- */
 #screen-final { justify-content: center; text-align: center; overflow: hidden; }
 .final-inner { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 480px; }
-.bloom { position: relative; width: min(66vw, 280px, 36dvh); aspect-ratio: 1; margin-bottom: 16px; }
+.bloom { position: relative; width: min(60vw, 260px, 33dvh); aspect-ratio: 1; margin-bottom: 40px; }
 .bloom .b-flower { position: absolute; width: 38%; left: 31%; top: 31%; opacity: 0; transform: rotate(var(--a)) translateY(-120%) scale(0.2); animation: bloomOut 1.4s cubic-bezier(.2, 1.3, .4, 1) var(--d) forwards; }
 .bloom .b-flower svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 6px 8px rgba(75, 52, 82, 0.2)); }
 .bloom .b-core { position: absolute; width: 36%; left: 32%; top: 32%; opacity: 0; animation: coreIn 1.2s cubic-bezier(.2, 1.3, .4, 1) 0.1s forwards; z-index: 2; }

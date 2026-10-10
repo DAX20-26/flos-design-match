@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FLOS DESIGN">
+<defs>
+<linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b24a98"/><stop offset="1" stop-color="#6a1456"/></linearGradient>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cdeeb8"/><stop offset="1" stop-color="#7cc269"/></linearGradient>
+</defs>
+<rect width="64" height="64" rx="14" fill="#fdeef4"/>
+<path d="M13 36C9 44 18 53 31 57C28 49 22 41 13 36Z" fill="url(#g)" stroke="#3d8a34" stroke-width="2" stroke-linejoin="round"/>
+<path d="M51 36C55 44 46 53 33 57C36 49 42 41 51 36Z" fill="url(#g)" stroke="#3d8a34" stroke-width="2" stroke-linejoin="round"/>
+<path d="M9 31C8 20 16 12 23 15C26 8 38 8 41 15C48 12 56 20 55 31C54 41 44 47 32 47C20 47 10 41 9 31Z" fill="url(#m)" stroke="#51103f" stroke-width="2" stroke-linejoin="round"/>
+<path d="M32 12C31 19 31 25 32 31" stroke="#fbe4f3" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>
+<path d="M27 41V21H41M27 30.5H38" fill="none" stroke="#fff9f3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

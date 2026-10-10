@@ -22,7 +22,7 @@ const VIEWPORTS = [
   { name: 'land-667x375', w: 667, h: 375, mobile: true, minBoard: 300 },
   { name: 'land-844x390', w: 844, h: 390, mobile: true, minBoard: 320 },
   { name: 'tablet-768x1024', w: 768, h: 1024, mobile: true, minBoard: 560 },
-  { name: 'desktop-1280x800', w: 1280, h: 800, mobile: false, minBoard: 500 },
+  { name: 'desktop-1280x800', w: 1280, h: 800, mobile: false, minBoard: 470 },
   { name: 'desktop-1920x1080', w: 1920, h: 1080, mobile: false, minBoard: 600 }
 ];
 
@@ -79,6 +79,7 @@ function check(cond, msg) { if (cond) console.log('  ok   ' + msg); else { failu
     check(await noHScroll(), 'finale: nessuno scroll orizzontale');
     check(await inView('#btn-replay'), 'finale: pulsante rigioca dentro lo schermo');
     check(await inView('.final-title'), 'finale: titolo dentro lo schermo');
+    check(await inView('.final-logo'), 'finale: logo FLOS DESIGN dentro lo schermo');
     if (SHOTS) await page.screenshot({ path: path.join(SHOTS, v.name + '-4final.png') });
     check(errors.length === 0, 'nessun errore JS' + (errors.length ? ': ' + errors.join(' | ') : ''));
     await ctx.close();

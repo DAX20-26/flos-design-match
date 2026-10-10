@@ -33,6 +33,10 @@
 
   function show(name) {
     ['start', 'game', 'final'].forEach(function (n) { els[n].classList.toggle('active', n === name); });
+    // il CSS usa data-screen per mostrare lo sfondo dipinto e le liane solo nella schermata di gioco
+    document.body.setAttribute('data-screen', name);
+    var theme = document.querySelector('meta[name="theme-color"]');
+    if (theme) theme.setAttribute('content', name === 'game' ? '#9bb868' : '#f6e8ea');
   }
 
   /* ---------- sfondo e illustrazioni statiche ---------- */
@@ -40,11 +44,17 @@
   function buildBackground() {
     document.getElementById('svg-defs').innerHTML = A.defs();
     if (reducedMotion) return;
-    var host = $('#bg-petals'), cols = ['#f4b8c8', '#cdbbea', '#f8dcae', '#bcd9b4', '#e68aa8'], html = '';
-    for (var i = 0; i < 12; i++) {
-      html += '<i class="bg-petal" style="left:' + Math.round(Math.random() * 100) + '%;--s:' + (8 + Math.round(Math.random() * 10)) + 'px;--col:' + cols[i % cols.length] +
-        ';--dur:' + (16 + Math.round(Math.random() * 16)) + 's;--delay:-' + Math.round(Math.random() * 30) + 's;--dx:' + (Math.round(Math.random() * 120) - 60) + 'px"></i>';
-    }
+    // Poche foglioline (verdi) e petali (rosa/magenta), lenti e morbidi. Nella schermata di gioco
+    // il CSS ne lascia visibili solo le prime tre, molto discrete.
+    var host = $('#bg-petals'), html = '';
+    var items = [
+      ['p', '#f4b8d0'], ['l', '#a9d68f'], ['p', '#d96fa8'], ['l', '#8fc47a'], ['p', '#f9d4e3'],
+      ['l', '#bde0a6'], ['p', '#e68aa8'], ['l', '#a9d68f'], ['p', '#f4b8d0'], ['l', '#bde0a6']
+    ];
+    items.forEach(function (it) {
+      html += '<i class="bg-petal' + (it[0] === 'l' ? ' leaf' : '') + '" style="left:' + Math.round(Math.random() * 100) + '%;--s:' + (8 + Math.round(Math.random() * 9)) + 'px;--col:' + it[1] +
+        ';--dur:' + (24 + Math.round(Math.random() * 20)) + 's;--delay:-' + Math.round(Math.random() * 40) + 's;--dx:' + (Math.round(Math.random() * 120) - 60) + 'px"></i>';
+    });
     host.innerHTML = html;
   }
 
